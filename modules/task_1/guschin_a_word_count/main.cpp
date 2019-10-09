@@ -4,7 +4,7 @@
 #include <string>
 #include "../../../modules/task_1/guschin_a_word_count/word_count.h"
 
-TEST(word_count, sequental) {
+TEST(word_count, sequentalCount) {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
@@ -15,7 +15,40 @@ TEST(word_count, sequental) {
   }
 }
 
-TEST(word_count, parallel) {
+TEST(word_count, isLetter_with_capital_letter) {
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  std::string st = "MPI is live ";
+  if (rank == 0) {
+    bool res = isLetter('A');
+    ASSERT_EQ(res, true);
+  }
+}
+
+TEST(word_count, isLetter_with_letter) {
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  std::string st = "MPI is live ";
+  if (rank == 0) {
+    bool res = isLetter('a');
+    ASSERT_EQ(res, true);
+  }
+}
+
+TEST(word_count, isLetter_with_another_symbol) {
+  int rank;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+  std::string st = "MPI is live ";
+  if (rank == 0) {
+    bool res = isLetter(';');
+    ASSERT_EQ(res, false);
+  }
+}
+
+TEST(word_count, parallelCount) {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::string st = "MPI is live ";
