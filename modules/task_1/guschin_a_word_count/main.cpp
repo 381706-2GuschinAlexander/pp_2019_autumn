@@ -8,9 +8,10 @@ TEST(word_count, sequentalCount) {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  std::string st = "MPI is live ";
+  
   if (rank == 0) {
-    int res = getLinearCount(st, 0, st.size());
+    std::string st = "MPI is live ";
+    int res = getLinearCount(st);
     ASSERT_EQ(res, 3);
   }
 }
@@ -52,7 +53,7 @@ TEST(word_count, parallelCount) {
   int rank;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::string st = "MPI is live ";
-  int res = getCount(st);
+  int res = getCount(st, st.size());
 
   if (rank == 0) {
     ASSERT_EQ(res, 3);
