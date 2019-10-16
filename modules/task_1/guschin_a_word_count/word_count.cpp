@@ -31,7 +31,7 @@ int getCount(const std::string st, int st_size) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  int start, len, local_count = 0;
+  int local_count = 0;
   int global_count;
   int delta = st_size / size;
   int rem = st_size % size;
