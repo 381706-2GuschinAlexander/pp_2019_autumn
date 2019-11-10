@@ -71,7 +71,6 @@ int getCount(const std::string st) {
              MPI_COMM_WORLD);
 
   if (rank == 0 && vec_size >= size) {
-
     for (int i = 1; i < size; i++)
       if (isLetter(st[i * delta + rem - 1]) && isLetter(st[i * delta + rem]))
         global_count--;

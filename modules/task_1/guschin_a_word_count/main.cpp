@@ -53,7 +53,6 @@ TEST(word_count, parallelCount) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   std::string st;
   if (rank == 0) {
-
     randWord(&st, 99);
   }
   int res = getCount(st);
