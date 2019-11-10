@@ -6,6 +6,7 @@
 #include <ctime>
 #include "../../../modules/task_1/guschin_a_word_count/word_count.h"
 
+
 bool isLetter(char sym) {
   return (sym <= 'z' && sym >= 'a') || (sym <= 'Z' && sym >= 'A');
 }
@@ -32,6 +33,7 @@ int getLinearCount(std::string st, int size) {
 
   return count;
 }
+
 
 int getCount(const std::string st) {
   int size, rank;
@@ -69,6 +71,7 @@ int getCount(const std::string st) {
              MPI_COMM_WORLD);
 
   if (rank == 0 && vec_size >= size) {
+
     for (int i = 1; i < size; i++)
       if (isLetter(st[i * delta + rem - 1]) && isLetter(st[i * delta + rem]))
         global_count--;
