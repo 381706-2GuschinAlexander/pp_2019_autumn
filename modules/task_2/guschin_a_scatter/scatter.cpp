@@ -2,6 +2,7 @@
 #include "../../../modules/task_2/guschin_a_scatter/scatter.h"
 #include <mpi.h>
 #include <string>
+#include <cstring>
 #include <vector>
 
 int MPI_Scatter_custom(void* send_buf, int send_count, MPI_Datatype send_type,

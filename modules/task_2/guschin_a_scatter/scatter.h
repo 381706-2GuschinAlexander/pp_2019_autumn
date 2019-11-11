@@ -3,6 +3,7 @@
 #define MODULES_TASK_2_GUSCHIN_A_SCATTER_SCATTER_H_
 #include <mpi.h>
 #include <string>
+#include <cstring>
 #include <vector>
 
 int MPI_Scatter_custom(void* sendbuf, int sendcount, MPI_Datatype sendtype,
