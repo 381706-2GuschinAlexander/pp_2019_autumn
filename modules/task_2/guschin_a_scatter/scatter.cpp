@@ -15,7 +15,7 @@ int MPI_Scatter_custom(void* send_buf, int send_count, MPI_Datatype send_type,
 
   if (MPI_Type_size(send_type, &send_type_size) == MPI_ERR_TYPE)
     return MPI_ERR_TYPE;
-    
+
   if (MPI_Type_size(recv_type, &recv_type_size) == MPI_ERR_TYPE)
     return MPI_ERR_TYPE;
 
