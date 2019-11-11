@@ -14,7 +14,8 @@ TEST(scatter, throw_when_different_size) {
     p = new int[3 * size];
     d = new int[3 * size];
   }
-  ASSERT_ANY_THROW(MPI_Scatter_custom(p, 1, MPI_INT, &dest[0], 99, MPI_INT, 0, MPI_COMM_WORLD));
+  EXPECT_EQ(MPI_Scatter_custom(p, 1, MPI_INT, &dest[0], 99, MPI_INT, 0, MPI_COMM_WORLD),
+            MPI_ERR_COUNT);
 }
 
 TEST(scatter, can_scatter_and_gather) {
