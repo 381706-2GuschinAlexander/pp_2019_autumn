@@ -10,6 +10,10 @@ TEST(scatter, throw_when_different_size) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   int *p, *d;
   int dest[3];
+  if (rank == 0) {
+    p = new int[3 * size];
+    d = new int[3 * size];
+  }
   ASSERT_ANY_THROW(MPI_Scatter_custom(p, 1, MPI_INT, &dest[0], 99, MPI_INT, 0, MPI_COMM_WORLD));
 }
 
