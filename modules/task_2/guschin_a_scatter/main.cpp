@@ -4,7 +4,14 @@
 #include <string>
 #include "../../../modules/task_2/guschin_a_scatter/scatter.h"
 
-
+TEST(scatter, throw_when_different_size) {
+  int rank, size;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  int *p, *d;
+  int dest[3];
+  ASSERT_ANY_THROW(MPI_Scatter_custom(p, 1, MPI_INT, &dest[0], 99, MPI_INT, 0, MPI_COMM_WORLD));
+}
 
 TEST(scatter, can_scatter_and_gather) {
   int rank, size;
@@ -18,7 +25,6 @@ TEST(scatter, can_scatter_and_gather) {
     for (int i = 0; i < 3 * size; ++i) p[i] = i;
   }
   MPI_Scatter_custom(p, 3, MPI_INT, &dest[0], 3, MPI_INT, 0, MPI_COMM_WORLD);
-  EXPECT_EQ(1, 1);
   MPI_Gather(&dest[0], 3, MPI_INT, d, 3, MPI_INT, 0, MPI_COMM_WORLD);
 
   if (rank == 0) {
@@ -28,6 +34,7 @@ TEST(scatter, can_scatter_and_gather) {
     EXPECT_EQ(isEq, 1);
   }
 }
+
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
   MPI_Init(&argc, &argv);
