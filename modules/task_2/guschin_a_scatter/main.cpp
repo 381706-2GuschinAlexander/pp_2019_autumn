@@ -11,7 +11,6 @@ TEST(scatter, throw_when_different_size) {
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   std::vector<int> p(1);
   int dest[3];
- 
   EXPECT_EQ(MPI_Scatter_custom(&p[0], 1, MPI_INT, &dest[0], 99, MPI_INT, 0, MPI_COMM_WORLD),
             MPI_ERR_COUNT);
 }
