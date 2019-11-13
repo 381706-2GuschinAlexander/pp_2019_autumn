@@ -27,13 +27,13 @@ int MPI_Scatter_custom(void* send_buf, int send_count, MPI_Datatype send_type,
   if (rank == root) {
     memcpy(
         recv_buf,
-        reinterpret_cast<char*>(send_buf) + rank * send_count * send_type_size,
+        static_cast<char*>(send_buf) + rank * send_count * send_type_size,
         send_count * send_type_size);
 
     for (int i = 0; i < size; i++) {
       if (i == root) continue;
       MPI_Send(
-          reinterpret_cast<char*>(send_buf) + i * send_count * send_type_size,
+          static_cast<char*>(send_buf) + i * send_count * send_type_size,
           send_count, send_type, i, 0, comm);
     }
   } else {

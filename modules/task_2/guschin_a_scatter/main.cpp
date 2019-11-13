@@ -23,7 +23,7 @@ TEST(scatter, can_scatter_and_gather_double) {
   std::vector<double> d(3 * size);
   double dest[3];
   if (rank == 0) {
-    for (int i = 0; i < 3 * size; ++i) p[i] = i + 1.0/i;
+    for (int i = 0; i < 3 * size; ++i) p[i] = i + 1.0/(i + 1);
   }
   MPI_Scatter_custom(&p[0], 3, MPI_DOUBLE, &dest[0], 3, MPI_DOUBLE, 0,
                      MPI_COMM_WORLD);
@@ -85,7 +85,7 @@ TEST(scatter, can_scatter_and_gather_float) {
   std::vector<float> d(3 * size);
   float dest[3];
   if (rank == 0) {
-    for (int i = 0; i < 3 * size; ++i) p[i] = i + 1.0 / i;
+    for (int i = 0; i < 3 * size; ++i) p[i] = i + 1.0 / (i + 1);
   }
   MPI_Scatter_custom(&p[0], 3, MPI_FLOAT, &dest[0], 3, MPI_FLOAT, 0,
                      MPI_COMM_WORLD);
