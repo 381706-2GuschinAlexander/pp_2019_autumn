@@ -34,12 +34,10 @@ TEST(scatter, can_scatter_and_gather_double) {
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
-  std::vector<double> p;
-  std::vector<double> d;
+  std::vector<double> p(mes_size * size);
+  std::vector<double> d(mes_size * size);
   std::vector<double> dest(mes_size);
   if (rank == root) {
-    p.resize(mes_size * size);
-    d.resize(mes_size * size);
     for (int i = 0; i < mes_size * size; ++i) p[i] = i + 1.0 / (i + 1);
   }
   MPI_Scatter_custom(&p[0], mes_size, MPI_DOUBLE, &dest[0], mes_size,
@@ -58,12 +56,10 @@ TEST(scatter, can_scatter_and_gather_int) {
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
-  std::vector<int> p;
-  std::vector<int> d;
+  std::vector<int> p(mes_size * size);
+  std::vector<int> d(mes_size * size);
   std::vector<int> dest(mes_size);
   if (rank == root) {
-    p.resize(mes_size * size);
-    d.resize(mes_size * size);
     for (int i = 0; i < mes_size * size; ++i) p[i] = i;
   }
   MPI_Scatter_custom(&p[0], mes_size, MPI_INT, &dest[0], mes_size, MPI_INT,
@@ -83,14 +79,11 @@ TEST(scatter, can_compare_custom_scatter_with_MPI_Scatter) {
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
-  std::vector<int> p;
-  std::vector<int> d1;
-  std::vector<int> d2;
+  std::vector<int> p(mes_size * size);
+  std::vector<int> d1(mes_size * size);
+  std::vector<int> d2(mes_size * size);
   std::vector<int> dest(mes_size);
   if (rank == root) {
-    p.resize(mes_size * size);
-    d1.resize(mes_size * size);
-    d2.resize(mes_size * size);
     for (int i = 0; i < mes_size * size; ++i) p[i] = i;
   }
   MPI_Scatter_custom(&p[0], mes_size, MPI_INT, &dest[0], mes_size, MPI_INT,
@@ -115,12 +108,10 @@ TEST(scatter, can_scatter_and_gather_float) {
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
-  std::vector<float> p;
-  std::vector<float> d;
+  std::vector<float> p(mes_size * size);
+  std::vector<float> d(mes_size * size);
   std::vector<float> dest(mes_size);
   if (rank == root) {
-    p.resize(mes_size * size);
-    d.resize(mes_size * size);
     for (int i = 0; i < mes_size * size; ++i) p[i] = i + 1.0 / (i + 1);
   }
   MPI_Scatter_custom(&p[0], mes_size, MPI_FLOAT, &dest[0], mes_size, MPI_FLOAT,
