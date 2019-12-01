@@ -4,6 +4,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+
 int MPI_Scatter_custom(void* send_buf, int send_count, MPI_Datatype send_type,
                        void* recv_buf, int recv_count, MPI_Datatype recv_type,
                        int root, MPI_Comm comm) {
