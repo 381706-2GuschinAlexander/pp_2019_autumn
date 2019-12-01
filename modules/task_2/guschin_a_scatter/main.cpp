@@ -191,7 +191,7 @@ TEST(scatter, can_scatter_bin_and_gather_float) {
 
 TEST(scatter, time) {
   int mes_size = 3;
-  int root = 199;
+  int root = 0;
   int rank, size;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
