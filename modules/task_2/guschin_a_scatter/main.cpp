@@ -119,7 +119,6 @@ TEST(scatter, can_scatter_and_gather_float) {
              MPI_COMM_WORLD);
 
   if (rank == root) {
-
     EXPECT_EQ(p, d);
   }
 }
