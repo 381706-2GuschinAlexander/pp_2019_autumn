@@ -113,9 +113,10 @@ TEST(matrix_mult_horiz_schem_only_A, check_correct_par_mult_matrix_1size) {
 
 TEST(matrix_mult_horiz_schem_only_A, check_correct_par_mult_matrix_even_size) {
     int rank;
+    MPI_Barrier(MPI_COMM_WORLD);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-    int sizeSide = 10;
+    int sizeSide = 20;
     std::vector<int> matrixA = createRandomMatrix(sizeSide);
     std::vector<int> matrixB = createRandomMatrix(sizeSide);
 
