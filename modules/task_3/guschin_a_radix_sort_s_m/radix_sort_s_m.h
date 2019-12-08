@@ -36,18 +36,17 @@ std::vector<T> Radix_sort(std::vector<T> st) {
   bool is_lit_end =
       *(reinterpret_cast<std::uint8_t*>(test_int16)) == 0 ? false : true;
   delete test_int16;
-
+  std::uint8_t* ptr = reinterpret_cast<std::uint8_t*>(&st[0]);
   int size = st.size();
   std::vector<T> res(size);
-
   for (int k = 0; k < b_len; ++k) {
-    std::uint8_t* ptr = reinterpret_cast<std::uint8_t*>(&st[0]);
+    
     int count[256] = {0};
     if (is_lit_end) {
       for (int i = 0; i < size; ++i) count[*(ptr + k + i * b_len)]++;
     } else {
       for (int i = 0; i < size; ++i)
-        count[*(ptr + b_len - 1 - k + i * b_len)]++;
+        count[*(ptr - k + i * b_len)]++;
     }
 
     int shift = 0;
@@ -69,8 +68,8 @@ std::vector<T> Radix_sort(std::vector<T> st) {
       }
     } else {
       for (int i = 0; i < size; ++i) {
-        res[(count[*(ptr + b_len - 1 - k + i * b_len)] + shift) % size] = st[i];
-        count[*(ptr + b_len - 1 - k + i * b_len)]++;
+        res[(count[*(ptr - k + i * b_len)] + shift) % size] = st[i];
+        count[*(ptr - k + i * b_len)]++;
       }
     }
     st = res;
