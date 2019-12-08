@@ -40,7 +40,6 @@ std::vector<T> Radix_sort(std::vector<T> st) {
   int size = st.size();
   std::vector<T> res(size);
   for (int k = 0; k < b_len; ++k) {
-    
     int count[256] = {0};
     if (is_lit_end) {
       for (int i = 0; i < size; ++i) count[*(ptr + k + i * b_len)]++;
