@@ -2,6 +2,7 @@
 #include <gtest/gtest.h>
 #include <gtest-mpi-listener.hpp>
 #include <string>
+#include <vector>
 #include "../../../modules/task_3/guschin_a_radix_sort_s_m/radix_sort_s_m.h"
 
 TEST(radix_sort, placeholder) {
@@ -15,9 +16,9 @@ TEST(radix_sort, placeholder) {
     vec.resize(1000);
     Fill_random(&vec[0], vec.size());
     std::vector<std::int64_t> res(Radix_sort(vec));
-
     bool is_sort = true;
-    for (int i = 1; i < vec.size(); ++i)
+    int length = vec.size();
+    for (int i = 1; i < length; ++i)
       if (res[i] < res[i - 1]) {
         is_sort = false;
         break;
@@ -40,7 +41,8 @@ TEST(radix_sort, placeholder2) {
   std::vector<std::int64_t> res(P_radix_sort(vec));
   if (rank == 0) {
     bool is_sort = true;
-    for (int i = 1; i < vec.size(); ++i)
+    int length = vec.size();
+    for (int i = 1; i < length; ++i)
       if (res[i] < res[i - 1]) {
         is_sort = false;
         break;
