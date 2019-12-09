@@ -11,8 +11,6 @@ int D_heap_cntr(int root, int size);
 
 template <class T>
 void Fill_random(T* vec, int size) {
-  bool is_signed = std::is_signed<T>::value;
-  int b_len = sizeof(T);
   std::mt19937 gen(time(0));
   for (int i = 0; i < size; ++i)  vec[i] = static_cast<T> (gen());
 }
