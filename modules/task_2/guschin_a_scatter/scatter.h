@@ -6,7 +6,7 @@
 #include <cstring>
 #include <vector>
 #include <iostream>
-#include <random>  
+#include <random>
 #include <ctime>
 
 int MPI_Scatter_custom(void* sendbuf, int sendcount, MPI_Datatype sendtype,
