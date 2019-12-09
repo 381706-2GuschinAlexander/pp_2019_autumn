@@ -158,8 +158,8 @@ TEST(radix_sort, can_sort_defined_array_int32) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  std::vector<std::int32_t> vec{-32, 11, 332, 42, 1 << 28, -8, 1 << 26, -1 << 26, 55, -24, -1 << 27, 1111};
-  std::vector<std::int32_t> expected{-1 << 27, -1 << 26, -32, -24, -8, 11, 42, 55, 332, 1111, 1 << 26, 1 << 28};
+  std::vector<std::int32_t> vec{-32, 11, 332, 42, 1 << 28, -8, 1 << 26, -(1 << 26), 55, -24, -(1 << 27), 1111};
+  std::vector<std::int32_t> expected{-(1 << 27), -(1 << 26), -32, -24, -8, 11, 42, 55, 332, 1111, 1 << 26, 1 << 28};
   std::vector<std::int32_t> res(P_radix_sort(vec));
   if (rank == 0) {
     EXPECT_EQ(res, expected);
