@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <random>  
+#include <random>
 #include <ctime>
 
 int MPI_Scatter_custom(void* send_buf, int send_count, MPI_Datatype send_type,
@@ -180,7 +180,7 @@ double Vector_sum_bin(std::vector<int> vec) {
   int side_size = vec_size % size;
 
   std::vector<double> local_vec(gen_size);
-  
+
   if (rank == 0) local_vec.resize(gen_size + side_size);
 
   MPI_Scatter_bin(&vec[0], gen_size, MPI_INT, &local_vec[0], gen_size, MPI_INT,
