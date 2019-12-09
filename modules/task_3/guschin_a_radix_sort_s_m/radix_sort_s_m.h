@@ -12,7 +12,7 @@ int D_heap_cntr(int root, int size);
 template <class T>
 void Fill_random(T* vec, int size) {
   std::mt19937 gen(time(0));
-  for (int i = 0; i < size; ++i)  vec[i] = static_cast<T> (gen());
+  for (int i = 0; i < size; ++i) vec[i] = static_cast<T>(gen());
 }
 
 template <class T>
@@ -67,7 +67,6 @@ std::vector<T> Radix_sort(std::vector<T> st) {
 
 template <class T>
 void Merge(T* res, T* vec_1, T* vec_2, int first_size, int second_size) {
-//  std::vector<T> res(first_size + second_size);
   int i = 0, j = 0;
   while (i < first_size && j < second_size) {
     if (vec_1[i] < vec_2[j]) {
@@ -109,18 +108,25 @@ std::vector<T> P_radix_sort(std::vector<T> st) {
   if (rank == 0) local_vector.resize(sort_size + sort_rem);
 
   MPI_Scatter(reinterpret_cast<std::uint8_t*>(&st[0]) + sort_rem * b_len,
-                  sort_size * b_len, MPI_CHAR, &local_vector[0],
-                  sort_size * b_len, MPI_CHAR, 0, MPI_COMM_WORLD);
+              sort_size * b_len, MPI_CHAR, &local_vector[0], sort_size * b_len,
+              MPI_CHAR, 0, MPI_COMM_WORLD);
 
   if (rank == 0) {
-    for (int i = 0; i < sort_rem; ++i)
-      local_vector[i] = st[i];
+    for (int i = sort_size; i < sort_rem + sort_size; ++i)
+      local_vector[i] = st[i - sort_size];
   }
-
   std::vector<T> sort_res(Radix_sort(local_vector));
+  int self_cntr = sort_size;
+  if (rank == 0) self_cntr += sort_rem;
 
   T* left_cntr = nullptr;
   T* rigth_cntr = nullptr;
+  T* rigth_merge = nullptr;
+
+  std::vector<T> total(
+      (D_heap_cntr(rank * 2 + 2, size) + D_heap_cntr(rank * 2 + 1, size)) *
+          sort_size + self_cntr);
+
   if (rank * 2 + 1 < size) {
     int child_w = D_heap_cntr(rank * 2 + 1, size);
     left_cntr = new T[child_w * sort_size];
@@ -138,29 +144,32 @@ std::vector<T> P_radix_sort(std::vector<T> st) {
              MPI_COMM_WORLD, &status);
   }
 
-  int self_cntr = sort_size;
-  if (rank == 0) self_cntr += sort_rem;
-  std::vector<T> prep_total(D_heap_cntr(rank * 2 + 2, size) * sort_size +
-                            self_cntr);
-  Merge(&prep_total[0], rigth_cntr, &sort_res[0],
-        D_heap_cntr(rank * 2 + 2, size) * sort_size,
-        sort_res.size());
-
-  std::vector<T> total(
-      (D_heap_cntr(rank * 2 + 2, size) + D_heap_cntr(rank * 2 + 1, size)) *
-          sort_size +
-      self_cntr);
-  Merge(&total[0], &prep_total[0], left_cntr, prep_total.size(),
-        D_heap_cntr(rank * 2 + 1, size) * sort_size);
-
-  if (rank != 0) {
-    MPI_Send(reinterpret_cast<std::uint8_t*>(&total[0]), total.size() * b_len,
+  if (rank * 2 + 1 >= size && rank * 2 + 2 >= size && rank != 0) {
+    MPI_Send(reinterpret_cast<std::uint8_t*>(&sort_res[0]),
+             sort_res.size() * b_len,
              MPI_CHAR, (rank - 1) / 2, 0, MPI_COMM_WORLD);
+  } else {
+    if (rank * 2 + 2 < size) {
+      rigth_merge =
+          new T[D_heap_cntr(rank * 2 + 2, size) * sort_size + self_cntr];
+      Merge(rigth_merge, rigth_cntr, &sort_res[0],
+            D_heap_cntr(rank * 2 + 2, size) * sort_size, self_cntr);
+      Merge(&total[0], rigth_merge, left_cntr,
+            D_heap_cntr(rank * 2 + 2, size) * sort_size + self_cntr,
+            D_heap_cntr(rank * 2 + 1, size) * sort_size);
+    } else {
+      Merge(&total[0], &sort_res[0], left_cntr,
+            self_cntr,
+            D_heap_cntr(rank * 2 + 1, size) * sort_size);
+    }
+    if (rank != 0) {
+      MPI_Send(reinterpret_cast<std::uint8_t*>(&total[0]), total.size() * b_len,
+               MPI_CHAR, (rank - 1) / 2, 0, MPI_COMM_WORLD);
+    }
   }
-
   if (left_cntr != nullptr) delete[] left_cntr;
   if (rigth_cntr != nullptr) delete[] rigth_cntr;
-
+  if (rigth_merge != nullptr) delete[] rigth_merge;
   return total;
 }
 #endif  // MODULES_TASK_3_GUSCHIN_A_RADIX_SORT_S_M_RADIX_SORT_S_M_H_
