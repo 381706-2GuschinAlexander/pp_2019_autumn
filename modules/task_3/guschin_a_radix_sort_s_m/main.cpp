@@ -16,6 +16,7 @@ TEST(radix_sort, placeholder) {
     vec.resize(1000);
     Fill_random(&vec[0], vec.size());
     std::vector<std::int64_t> res(Radix_sort(vec));
+    std::cout << "firtst test" << std::endl;
     bool is_sort = true;
     int length = vec.size();
     for (int i = 1; i < length; ++i)
@@ -32,14 +33,11 @@ TEST(radix_sort, placeholder2) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-  std::vector<std::int64_t> vec;
-
-  if (rank == 0) {
-    vec.resize(1000);
-    Fill_random(&vec[0], vec.size());
-  }
+  std::vector<std::int64_t> vec(1000);
+  Fill_random(&vec[0], vec.size());
   std::vector<std::int64_t> res(P_radix_sort(vec));
   if (rank == 0) {
+    std::cout << "second test" << std::endl;
     bool is_sort = true;
     int length = vec.size();
     for (int i = 1; i < length; ++i)

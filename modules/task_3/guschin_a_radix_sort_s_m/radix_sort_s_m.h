@@ -14,17 +14,7 @@ void Fill_random(T* vec, int size) {
   bool is_signed = std::is_signed<T>::value;
   int b_len = sizeof(T);
   std::mt19937 gen(time(0));
-
-  for (int i = 0; i < size; ++i)
-    if (is_signed) {
-      if (gen() % 2 == 0) {
-        vec[i] = (gen() % static_cast<std::uint64_t>(pow(2, 8 * b_len))) / 2;
-      } else {
-        vec[i] = -(gen() % static_cast<std::uint64_t>(pow(2, 8 * b_len))) / 2;
-      }
-    } else {
-      vec[i] = gen() % static_cast<std::uint64_t>(pow(2, 8 * b_len));
-    }
+  for (int i = 0; i < size; ++i)  vec[i] = static_cast<T> (gen());
 }
 
 template <class T>
@@ -45,7 +35,7 @@ std::vector<T> Radix_sort(std::vector<T> st) {
       for (int i = 0; i < size; ++i) count[*(ptr + k + i * b_len)]++;
     } else {
       for (int i = 0; i < size; ++i)
-        count[*(ptr - k + i * b_len)]++;
+        count[*(ptr + b_len - 1 - k + i * b_len)]++;
     }
 
     int shift = 0;
@@ -67,8 +57,8 @@ std::vector<T> Radix_sort(std::vector<T> st) {
       }
     } else {
       for (int i = 0; i < size; ++i) {
-        res[(count[*(ptr - k + i * b_len)] + shift) % size] = st[i];
-        count[*(ptr - k + i * b_len)]++;
+        res[(count[*(ptr + b_len - 1 - k + i * b_len)] + shift) % size] = st[i];
+        count[*(ptr + b_len - 1 - k + i * b_len)]++;
       }
     }
     st = res;
@@ -78,10 +68,8 @@ std::vector<T> Radix_sort(std::vector<T> st) {
 }
 
 template <class T>
-std::vector<T> Merge(const std::vector<T>& vec_1, const std::vector<T>& vec_2) {
-  int first_size = vec_1.size();
-  int second_size = vec_2.size();
-  std::vector<T> res(first_size + second_size);
+void Merge(T* res, T* vec_1, T* vec_2, int first_size, int second_size) {
+//  std::vector<T> res(first_size + second_size);
   int i = 0, j = 0;
   while (i < first_size && j < second_size) {
     if (vec_1[i] < vec_2[j]) {
@@ -100,7 +88,6 @@ std::vector<T> Merge(const std::vector<T>& vec_1, const std::vector<T>& vec_2) {
     res[i + j] = vec_2[j];
     ++j;
   }
-  return res;
 }
 
 template <class T>
@@ -123,44 +110,58 @@ std::vector<T> P_radix_sort(std::vector<T> st) {
   std::vector<T> local_vector(sort_size);
   if (rank == 0) local_vector.resize(sort_size + sort_rem);
 
-  MPI_Scatter(reinterpret_cast<std::uint8_t*>(&st[0]) +
-                      (sort_rem + rank * sort_size) * b_len,
+  MPI_Scatter(reinterpret_cast<std::uint8_t*>(&st[0]) + sort_rem * b_len,
                   sort_size * b_len, MPI_CHAR, &local_vector[0],
                   sort_size * b_len, MPI_CHAR, 0, MPI_COMM_WORLD);
 
   if (rank == 0) {
-    for (int i = sort_size; i < sort_size + sort_rem; ++i)
+    for (int i = 0; i < sort_rem; ++i)
       local_vector[i] = st[i];
   }
 
   std::vector<T> sort_res(Radix_sort(local_vector));
 
-  std::vector<T> left_cntr;
-  std::vector<T> rigth_cntr;
+  T* left_cntr = nullptr;
+  T* rigth_cntr = nullptr;
   if (rank * 2 + 1 < size) {
     int child_w = D_heap_cntr(rank * 2 + 1, size);
-    left_cntr.resize(child_w * sort_size);
+    left_cntr = new T[child_w * sort_size];
     MPI_Status status;
-    MPI_Recv(reinterpret_cast<std::uint8_t*>(&left_cntr[0]),
+    MPI_Recv(reinterpret_cast<std::uint8_t*>(left_cntr),
              child_w * sort_size * b_len, MPI_CHAR, rank * 2 + 1, 0,
              MPI_COMM_WORLD, &status);
   }
   if (rank * 2 + 2 < size) {
     int child_w = D_heap_cntr(rank * 2 + 2, size);
-    rigth_cntr.resize(child_w * sort_size);
+    rigth_cntr = new T[child_w * sort_size];
     MPI_Status status;
-    MPI_Recv(reinterpret_cast<std::uint8_t*>(&rigth_cntr[0]),
+    MPI_Recv(reinterpret_cast<std::uint8_t*>(rigth_cntr),
              child_w * sort_size * b_len, MPI_CHAR, rank * 2 + 2, 0,
              MPI_COMM_WORLD, &status);
   }
 
-  std::vector<T> prep_total = Merge(rigth_cntr, sort_res);
-  std::vector<T> total = Merge(prep_total, left_cntr);
+  int self_cntr = sort_size;
+  if (rank == 0) self_cntr += sort_rem;
+  std::vector<T> prep_total(D_heap_cntr(rank * 2 + 2, size) * sort_size +
+                            self_cntr);
+  Merge(&prep_total[0], rigth_cntr, &sort_res[0],
+        D_heap_cntr(rank * 2 + 2, size) * sort_size,
+        sort_res.size());
+
+  std::vector<T> total(
+      (D_heap_cntr(rank * 2 + 2, size) + D_heap_cntr(rank * 2 + 1, size)) *
+          sort_size +
+      self_cntr);
+  Merge(&total[0], &prep_total[0], left_cntr, prep_total.size(),
+        D_heap_cntr(rank * 2 + 1, size) * sort_size);
 
   if (rank != 0) {
     MPI_Send(reinterpret_cast<std::uint8_t*>(&total[0]), total.size() * b_len,
              MPI_CHAR, (rank - 1) / 2, 0, MPI_COMM_WORLD);
   }
+
+  if (left_cntr != nullptr) delete[] left_cntr;
+  if (rigth_cntr != nullptr) delete[] rigth_cntr;
 
   return total;
 }
