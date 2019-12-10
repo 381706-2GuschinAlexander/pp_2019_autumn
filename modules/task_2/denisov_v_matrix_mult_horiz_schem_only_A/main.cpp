@@ -134,23 +134,6 @@ TEST(matrix_mult_horiz_schem_only_A, check_correct_par_mult_matrix_even_size) {
     }
 }
 
-TEST(matrix_mult_horiz_schem_only_A, check_correct_par_mult_matrix_odd_size) {
-    int rank;
-    MPI_Barrier(MPI_COMM_WORLD);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-    int sizeSide = 15;
-    std::vector<int> matrixA = createRandomMatrix(sizeSide);
-    std::vector<int> matrixB = createRandomMatrix(sizeSide);
-
-    std::vector<int> resultPar = getMatrixMultPar(matrixA, matrixB, sizeSide);
-
-    if (rank == 0) {
-        std::vector<int> resultSeq = getMatrixMultSeq(matrixA, matrixB, sizeSide);
-        ASSERT_EQ(resultSeq, resultPar);
-    }
-}
-
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
     MPI_Init(&argc, &argv);
