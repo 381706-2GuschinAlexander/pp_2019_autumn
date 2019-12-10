@@ -190,6 +190,54 @@ TEST(scatter, can_scatter_bin_and_gather_float) {
 }
 
 TEST(scatter, time) {
+  int vec_size = 100;
+  int rank, size;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  std::vector<int> p(vec_size);
+
+  if (rank == 0) {
+    Get_rand(&p[0], vec_size);
+  }
+  double time_f1, time_s1, time_f2, time_s2;
+  time_f1 = MPI_Wtime();
+  int sum1 = Vector_sum_bin(p);
+  time_s1 = MPI_Wtime();
+  if (rank == 0) std::cout << "bin time " << time_s1 - time_f1 << std::endl;
+
+  time_f2 = MPI_Wtime();
+  int sum2 = Vector_sum(p);
+  time_s2 = MPI_Wtime();
+  if (rank == 0) std::cout << "st time " << time_s2 - time_f2 << std::endl;
+
+  if (rank == 0) {
+    EXPECT_EQ(sum1, sum2);
+  }
+}
+
+TEST(scatter, can_scatter_bin_and_gather_float) {
+  int mes_size = 3;
+  int root = 0;
+  int rank, size;
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &size);
+  std::vector<float> p(mes_size * size);
+  std::vector<float> d(mes_size * size);
+  std::vector<float> dest(mes_size);
+  if (rank == root) {
+    for (int i = 0; i < mes_size * size; ++i) p[i] = i + 1.0 / (i + 1);
+  }
+  MPI_Scatter_bin(&p[0], mes_size, MPI_FLOAT, &dest[0], mes_size, MPI_FLOAT,
+                  root, MPI_COMM_WORLD);
+  MPI_Gather(&dest[0], mes_size, MPI_FLOAT, &d[0], mes_size, MPI_FLOAT, root,
+             MPI_COMM_WORLD);
+
+  if (rank == root) {
+    EXPECT_EQ(p, d);
+  }
+}
+
+TEST(scatter, time) {
   int mes_size = 3;
   int root = 0;
   int rank, size;
